@@ -12,6 +12,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using SubSonic.Schema;
+using SubSonic.Extensions;
 
 namespace SubSonic.Linq.Structure
 {
@@ -44,10 +45,10 @@ namespace SubSonic.Linq.Structure
         public override bool IsIdentity(MemberInfo member)
         {
             // Customers has CustomerID, Orders has OrderID, etc
-            if (this.IsColumn(member)) 
+            if (this.IsColumn(member))
             {
                 string name = NameWithoutTrailingDigits(member.Name);
-                return member.Name.EndsWith("ID") && member.DeclaringType.Name.StartsWith(member.Name.Substring(0, member.Name.Length - 2)); 
+                return member.Name.EndsWith("ID") && member.DeclaringType.Name.StartsWith(member.Name.Substring(0, member.Name.Length - 2));
             }
             return false;
         }
@@ -84,27 +85,30 @@ namespace SubSonic.Linq.Structure
 
         public override string GetTableName(Type rowType)
         {
-            
+
             string tableName = rowType.Name;
             ITable tbl = this.Language.DataProvider.FindOrCreateTable(rowType);
 
             //lookup the schema and properly name this thing
-            if(tbl!=null)
+            if (tbl != null)
                 tableName = this.Language.DataProvider.QualifyTableName(tbl);
             else
-                tableName=this.Language.Quote(SplitWords(Plural(rowType.Name)));
-            
+                tableName = this.Language.Quote(SplitWords(Plural(rowType.Name)));
+
             return tableName;
         }
 
         public override string GetColumnName(MemberInfo member)
         {
-            string propertyName = member.Name;
+            string propertyName = member.Name.EndsWith("X") ? member.Name.Chop(1) : member.Name;
             string result = "";
-            try {
+            try
+            {
                 IColumn column = this.Language.DataProvider.FindTable(member.ReflectedType.Name).GetColumnByPropertyName(propertyName);
                 result = column == null ? "" : column.Name;
-            } catch {
+            }
+            catch
+            {
 
             }
             return result;
@@ -159,13 +163,13 @@ namespace SubSonic.Linq.Structure
 
         public static string Plural(string name)
         {
-            if (name.EndsWith("x", StringComparison.InvariantCultureIgnoreCase) 
+            if (name.EndsWith("x", StringComparison.InvariantCultureIgnoreCase)
                 || name.EndsWith("ch", StringComparison.InvariantCultureIgnoreCase)
-                || name.EndsWith("ss", StringComparison.InvariantCultureIgnoreCase)) 
+                || name.EndsWith("ss", StringComparison.InvariantCultureIgnoreCase))
             {
                 return name + "es";
             }
-            else if (name.EndsWith("y", StringComparison.InvariantCultureIgnoreCase)) 
+            else if (name.EndsWith("y", StringComparison.InvariantCultureIgnoreCase))
             {
                 return name.Substring(0, name.Length - 1) + "ies";
             }

@@ -72,7 +72,11 @@ namespace SubSonic.Schema
         }
 
         public string Name { get; set; }
-        public string PropertyName { get; set; }
+        public string PropertyName
+        {
+            get;
+            set;
+        }
 
         public string ParameterName
         {
