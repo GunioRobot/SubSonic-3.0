@@ -44,5 +44,7 @@ namespace SubSonic.Schema
         void SetIsLoaded(bool isLoaded);
         void SetIsNew(bool isLoaded);
 
+        /** Get All PK's **/
+        IEnumerable<IColumn> GetPrimaryKeys();
     }
 }

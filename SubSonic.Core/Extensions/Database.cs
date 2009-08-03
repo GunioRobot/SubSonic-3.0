@@ -351,14 +351,35 @@ namespace SubSonic.Extensions
                 }
             }
 
-            //add the PK constraint
-            Constraint c = new Constraint(ConstraintType.Where, tbl.PrimaryKey.Name)
-                               {
-                                   ParameterValue = settings[tbl.PrimaryKey.Name],
-                                   ParameterName = tbl.PrimaryKey.Name,
-                                   ConstructionFragment = tbl.PrimaryKey.Name
-                               };
-            query.Constraints.Add(c);
+            if (item is IActiveRecord)
+            {
+                var ar = item as IActiveRecord;
+                foreach (var column in ar.GetPrimaryKeys())
+                {
+                    ConstraintType constraintType = ConstraintType.Where;
+                    if (query.Constraints.Count >= 1)
+                        constraintType = ConstraintType.And;
+
+                    Constraint c = new Constraint(constraintType, column.Name)
+                    {
+                        ParameterValue = settings[column.Name],
+                        ParameterName = column.Name,
+                        ConstructionFragment = column.Name
+                    };
+                    query.Constraints.Add(c);
+                }
+            }
+            else
+            {
+                //add the PK constraint
+                Constraint c = new Constraint(ConstraintType.Where, tbl.PrimaryKey.Name)
+                                   {
+                                       ParameterValue = settings[tbl.PrimaryKey.Name],
+                                       ParameterName = tbl.PrimaryKey.Name,
+                                       ConstructionFragment = tbl.PrimaryKey.Name
+                                   };
+                query.Constraints.Add(c);
+            }
 
             return query;
         }
