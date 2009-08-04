@@ -26,8 +26,22 @@ namespace SubSonic.Linq.Translation.MySql
                         sb.Append(")");
                         return m;
                 }
-            } else if (m.Member.DeclaringType == typeof(DateTime) || m.Member.DeclaringType == typeof(DateTimeOffset)) {
-                switch (m.Member.Name) {
+            }
+            else if (m.Member.DeclaringType == typeof(TimeSpan))
+            {
+                switch (m.Member.Name)
+                {
+                    case "TotalDays":
+                        this.Visit(m.Expression);
+                        return m;
+                    default:
+                        break;
+                }
+            }
+            else if (m.Member.DeclaringType == typeof(DateTime) || m.Member.DeclaringType == typeof(DateTimeOffset))
+            {
+                switch (m.Member.Name)
+                {
                     case "Day":
                         sb.Append("DAY(");
                         this.Visit(m.Expression);
@@ -189,6 +203,17 @@ namespace SubSonic.Linq.Translation.MySql
                             this.Visit(m.Arguments[0]);
                             sb.Append(", ");
                             this.Visit(m.Arguments[1]);
+                            sb.Append(")");
+                            return m;
+                        }
+                        break;
+                    case "Subtract":
+                        if (m.Arguments[0].Type == typeof(DateTime))
+                        {
+                            sb.Append("DATEDIFF(");
+                            this.Visit(m.Object);
+                            sb.Append(",");
+                            this.Visit(m.Arguments[0]);
                             sb.Append(")");
                             return m;
                         }
