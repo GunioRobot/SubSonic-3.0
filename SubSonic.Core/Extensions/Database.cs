@@ -165,6 +165,10 @@ namespace SubSonic.Extensions
                     Type valueType = rdr.GetValue(i).GetType();
                     if (valueType == typeof(Boolean))
                         currentProp.SetValue(item, (rdr.GetValue(i).ToString() == "1"), null);
+                    else if (currentProp.PropertyType == typeof(String) && valueType != typeof(String))
+                    {
+                        currentProp.SetValue(item, rdr.GetValue(i).ToString(), null);
+                    }
                     else if (currentProp.PropertyType == typeof(Guid))
                         currentProp.SetValue(item, rdr.GetGuid(i), null);
                     else
