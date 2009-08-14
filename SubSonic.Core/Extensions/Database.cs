@@ -155,6 +155,10 @@ namespace SubSonic.Extensions
             {
                 string pName = rdr.GetName(i);
                 currentProp = cachedProps.SingleOrDefault(x => (x.Name.EndsWith("X") ? x.Name.Chop(1) : x.Name).Equals(pName, StringComparison.InvariantCultureIgnoreCase));
+                
+                if (currentProp == null)
+                    /** maybe this is projection **/
+                    currentProp = cachedProps[i];
 
                 //if the property is null, likely it's a Field
                 if (currentProp == null)
