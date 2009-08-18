@@ -138,10 +138,7 @@ namespace SubSonic.Extensions
             return query.Constraints;
         }
 
-        /// <summary>
-        /// Coerces an IDataReader to try and load an object using name/property matching
-        /// </summary>
-        public static void Load<T>(this IDataReader rdr, T item)
+        public static void Load<T>(this IDataReader rdr, T item, List<string> ColumnNames)
         {
             Type iType = typeof(T);
 
@@ -155,10 +152,11 @@ namespace SubSonic.Extensions
             {
                 string pName = rdr.GetName(i);
                 currentProp = cachedProps.SingleOrDefault(x => (x.Name.EndsWith("X") ? x.Name.Chop(1) : x.Name).Equals(pName, StringComparison.InvariantCultureIgnoreCase));
-                
-                if (currentProp == null)
-                    /** maybe this is projection **/
-                    currentProp = cachedProps[i];
+
+                if (currentProp == null && ColumnNames.Count != 0)
+                {
+                    currentProp = cachedProps.First(x => x.Name == ColumnNames[i]);
+                }
 
                 //if the property is null, likely it's a Field
                 if (currentProp == null)
@@ -198,6 +196,13 @@ namespace SubSonic.Extensions
 
             }
 
+        }
+        /// <summary>
+        /// Coerces an IDataReader to try and load an object using name/property matching
+        /// </summary>
+        public static void Load<T>(this IDataReader rdr, T item)
+        {
+            Load(rdr, item, null);
         }
 
         /// <summary>
@@ -266,12 +271,19 @@ namespace SubSonic.Extensions
                    type == typeof(bool?);
         }
 
+        public static IEnumerable<T> ToEnumerable<T>(this IDataReader rdr)
+        {
+            return ToEnumerable<T>(rdr);
+        }
+
         /// <summary>
-        /// Coerces an IDataReader to load an enumerable of T
+        /// Make into Enumerable
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="rdr"></param>
-        public static IEnumerable<T> ToEnumerable<T>(this IDataReader rdr)
+        /// <param name="rdr">The RDR.</param>
+        /// <param name="ColumnNames">The column names.</param>
+        /// <returns></returns>
+        public static IEnumerable<T> ToEnumerable<T>(this IDataReader rdr, List<string> ColumnNames)
         {
             List<T> result = new List<T>();
             while (rdr.Read())
@@ -302,7 +314,7 @@ namespace SubSonic.Extensions
                     instance = Activator.CreateInstance<T>();
 
                 //do we have a parameterless constructor?
-                Load(rdr, instance);
+                Load(rdr, instance, ColumnNames);
                 result.Add(instance);
             }
             return result.AsEnumerable();
