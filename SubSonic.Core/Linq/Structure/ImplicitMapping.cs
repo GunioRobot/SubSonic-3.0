@@ -100,7 +100,8 @@ namespace SubSonic.Linq.Structure
 
         public override string GetColumnName(MemberInfo member)
         {
-            string propertyName = member.Name.EndsWith("X") ? member.Name.Chop(1) : member.Name;
+            //string propertyName = member.Name.EndsWith("X") ? member.Name.Chop(1) : member.Name;
+            string propertyName = member.Name;
             string result = "";
             try
             {

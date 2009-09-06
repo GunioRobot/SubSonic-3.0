@@ -151,7 +151,8 @@ namespace SubSonic.Extensions
             for (int i = 0; i < rdr.FieldCount; i++)
             {
                 string pName = rdr.GetName(i);
-                currentProp = cachedProps.SingleOrDefault(x => (x.Name.EndsWith("X") ? x.Name.Chop(1) : x.Name).Equals(pName, StringComparison.InvariantCultureIgnoreCase));
+//                currentProp = cachedProps.SingleOrDefault(x => (x.Name.EndsWith("X") ? x.Name.Chop(1) : x.Name).Equals(pName, StringComparison.InvariantCultureIgnoreCase));
+                currentProp = cachedProps.SingleOrDefault(x => x.Name.Equals(pName, StringComparison.InvariantCultureIgnoreCase));
 
                 if (currentProp == null && ColumnNames.Count != 0)
                 {
@@ -165,7 +166,7 @@ namespace SubSonic.Extensions
                 if (currentProp != null && !DBNull.Value.Equals(rdr.GetValue(i)))
                 {
                     Type valueType = rdr.GetValue(i).GetType();
-                    if (valueType == typeof(Boolean))
+                    if (valueType == typeof(Boolean) || currentProp.PropertyType == typeof(Boolean?))
                         currentProp.SetValue(item, (rdr.GetValue(i).ToString() == "1"), null);
                     else if (currentProp.PropertyType == typeof(String) && valueType != typeof(String))
                     {
@@ -420,7 +421,8 @@ namespace SubSonic.Extensions
                 ;
                 foreach (string key in hashed.Keys)
                 {
-                    IColumn col = tbl.GetColumn(key.EndsWith("X") ? key.Chop(1) : key);
+                    //IColumn col = tbl.GetColumn(key.EndsWith("X") ? key.Chop(1) : key);
+                    IColumn col = tbl.GetColumn(key);
                     if (col != null)
                     {
                         if (!col.AutoIncrement)

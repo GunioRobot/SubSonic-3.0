@@ -284,9 +284,6 @@ namespace SubSonic.Linq.Structure
                     //use our reader stuff
                     //thanks to Pascal LaCroix for the help here...
                     var resultType = typeof(T);
-
-                    var test = mapping.GetMappedMembers(resultType);
-
                     if (resultType.IsValueType)
                     {
                         result = reader.ToEnumerableValueType<T>();
