@@ -18,9 +18,6 @@ namespace SubSonic.Schema
         string ParameterName { get; }
         string PropertyName { get; set; }
 
-        /** added by Reski to Support Dynamic CleanUp Column Name **/
-        string CleanName { get; set; }
-        
         ITable ForeignKeyTo { get; set; }
 
         /// <summary>

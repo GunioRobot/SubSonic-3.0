@@ -21,7 +21,7 @@ namespace SubSonic.Linq.Translation
     public class Parameterizer : DbExpressionVisitor
     {
         Dictionary<object, NamedValueExpression> map = new Dictionary<object, NamedValueExpression>();
-        Dictionary<Expression, NamedValueExpression> pmap = new Dictionary<Expression, NamedValueExpression>();
+        Dictionary<Expression, NamedValueExpression> pmap = new Dictionary<Expression,NamedValueExpression>();
 
         private Parameterizer()
         {
@@ -36,8 +36,7 @@ namespace SubSonic.Linq.Translation
         {
             // don't parameterize the projector or aggregator!
             SelectExpression select = (SelectExpression)this.Visit(proj.Source);
-            if (select != proj.Source)
-            {
+            if (select != proj.Source) {
                 return new ProjectionExpression(select, proj.Projector, proj.Aggregator);
             }
             return proj;
@@ -46,11 +45,9 @@ namespace SubSonic.Linq.Translation
         int iParam = 0;
         protected override Expression VisitConstant(ConstantExpression c)
         {
-            if (c.Value != null && !IsNumeric(c.Value.GetType()))
-            {
+            if (c.Value != null && !IsNumeric(c.Value.GetType())) {
                 NamedValueExpression nv;
-                if (!this.map.TryGetValue(c.Value, out nv))
-                { // re-use same name-value if same value
+                if (!this.map.TryGetValue(c.Value, out nv)) { // re-use same name-value if same value
                     string name = "p" + (iParam++);
                     nv = new NamedValueExpression(name, c);
                     this.map.Add(c.Value, nv);
@@ -60,7 +57,7 @@ namespace SubSonic.Linq.Translation
             return c;
         }
 
-        protected override Expression VisitParameter(ParameterExpression p)
+        protected override Expression VisitParameter(ParameterExpression p) 
         {
             return this.GetNamedValue(p);
         }
@@ -79,8 +76,7 @@ namespace SubSonic.Linq.Translation
 
         private bool IsNumeric(Type type)
         {
-            switch (Type.GetTypeCode(type))
-            {
+            switch (Type.GetTypeCode(type)) {
                 case TypeCode.Boolean:
                 case TypeCode.Byte:
                 case TypeCode.Decimal:
@@ -99,25 +95,7 @@ namespace SubSonic.Linq.Translation
             }
         }
     }
-    internal class ColumnNamedGatherer : DbExpressionVisitor
-    {
-        List<string> columnNames = new List<string>();
-        internal static List<string> Gather(Expression ex)
-        {
-            ColumnNamedGatherer gatherer = new ColumnNamedGatherer();
-            gatherer.Visit(ex);
-            return gatherer.columnNames;
-        }
-        protected override Expression VisitMemberInit(MemberInitExpression init)
-        {
-            //var ex = this.VisitBinding(init.Bindings[0]);
-            foreach (var binding in init.Bindings)
-            {
-                this.columnNames.Add(binding.Member.Name);
-            }
-            return init;
-        }
-    }
+
     internal class NamedValueGatherer : DbExpressionVisitor
     {
         HashSet<NamedValueExpression> namedValues = new HashSet<NamedValueExpression>();

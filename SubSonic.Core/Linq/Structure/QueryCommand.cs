@@ -8,20 +8,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Common;
-using System.Data;
 
 namespace SubSonic.Linq.Structure
 {
     public class QueryCommand<T>
     {
-        public List<string> ColumnNames = new List<string>();
-        public QueryCommand(string commandText, IEnumerable<string> paramNames, Func<DbDataReader, T> projector,List<string> ColumnNames)
+        public QueryCommand(string commandText, IEnumerable<string> paramNames, Func<DbDataReader, T> projector)
         {
             CommandText = commandText;
             ParameterNames = new List<string>(paramNames).AsReadOnly();
             Projector = projector;
-            this.ColumnNames = ColumnNames;
-
         }
 
         public string CommandText { get; private set; }

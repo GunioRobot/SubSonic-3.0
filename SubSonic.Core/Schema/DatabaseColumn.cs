@@ -58,10 +58,7 @@ namespace SubSonic.Schema
         public int NumericPrecision { get; set; }
         public bool IsPrimaryKey { get; set; }
         public object DefaultSetting { get; set; }
-        
-        /** added by Reski to Support Dynamic CleanUp Column Name **/
-        public string CleanName { get; set; }
-        
+
         public string SchemaName
         {
             get { return Table.SchemaName; }
@@ -75,11 +72,7 @@ namespace SubSonic.Schema
         }
 
         public string Name { get; set; }
-        public string PropertyName
-        {
-            get;
-            set;
-        }
+        public string PropertyName { get; set; }
 
         public string ParameterName
         {

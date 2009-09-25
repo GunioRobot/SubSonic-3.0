@@ -26,22 +26,8 @@ namespace SubSonic.Linq.Translation.MySql
                         sb.Append(")");
                         return m;
                 }
-            }
-            else if (m.Member.DeclaringType == typeof(TimeSpan))
-            {
-                switch (m.Member.Name)
-                {
-                    case "TotalDays":
-                        this.Visit(m.Expression);
-                        return m;
-                    default:
-                        break;
-                }
-            }
-            else if (m.Member.DeclaringType == typeof(DateTime) || m.Member.DeclaringType == typeof(DateTimeOffset))
-            {
-                switch (m.Member.Name)
-                {
+            } else if (m.Member.DeclaringType == typeof(DateTime) || m.Member.DeclaringType == typeof(DateTimeOffset)) {
+                switch (m.Member.Name) {
                     case "Day":
                         sb.Append("DAY(");
                         this.Visit(m.Expression);
@@ -207,17 +193,6 @@ namespace SubSonic.Linq.Translation.MySql
                             return m;
                         }
                         break;
-                    case "Subtract":
-                        if (m.Arguments[0].Type == typeof(DateTime))
-                        {
-                            sb.Append("DATEDIFF(");
-                            this.Visit(m.Object);
-                            sb.Append(",");
-                            this.Visit(m.Arguments[0]);
-                            sb.Append(")");
-                            return m;
-                        }
-                        break;
                 }
             } else if (m.Method.DeclaringType == typeof(Decimal)) {
                 switch (m.Method.Name) {
@@ -331,8 +306,7 @@ namespace SubSonic.Linq.Translation.MySql
                 if (m.Object.Type == typeof(string)) {
                     this.Visit(m.Object);  // no op
                 } else {
-                    //sb.Append("CONVERT(VARCHAR(MAX), ");
-                    sb.Append("concat(");
+                    sb.Append("CONVERT(VARCHAR(MAX), ");
                     this.Visit(m.Object);
                     sb.Append(")");
                 }

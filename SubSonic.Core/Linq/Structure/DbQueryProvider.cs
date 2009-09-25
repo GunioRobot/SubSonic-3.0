@@ -41,7 +41,7 @@ namespace SubSonic.Linq.Structure
             language = mapping.Language;
             //log = log;
         }
-
+        
         public DbQueryProvider(IDataProvider provider)
         {
             _provider = provider;
@@ -52,7 +52,7 @@ namespace SubSonic.Linq.Structure
                 case DataClient.MySqlClient:
                     lang = new MySqlLanguage(_provider);
                     break;
-                case DataClient.SQLite:
+                case  DataClient.SQLite:
                     lang = new SqliteLanguage(_provider);
                     break;
                 default:
@@ -126,7 +126,7 @@ namespace SubSonic.Linq.Structure
             else
             {
                 // compile the execution plan and invoke it
-                Expression<Func<object>> efn = ConvertThis(plan, typeof(object));
+                Expression<Func<object>> efn = ConvertThis(plan,typeof(object));
                 Func<object> fn = efn.Compile();
                 return fn();
             }
@@ -247,35 +247,34 @@ namespace SubSonic.Linq.Structure
             //DbDataReader reader = cmd.ExecuteReader();
             //return Project(reader, query.Projector);
 
+            
 
             QueryCommand cmd = new QueryCommand(query.CommandText, _provider);
             for (int i = 0; i < paramValues.Length; i++)
             {
-
+                
                 //need to assign a DbType
                 var valueType = paramValues[i].GetType();
                 var dbType = Database.GetDbType(valueType);
-
-
-                cmd.AddParameter(query.ParameterNames[i], paramValues[i], dbType);
+                
+                
+                cmd.AddParameter(query.ParameterNames[i], paramValues[i],dbType);
             }
-            /*
-                        var reader = _provider.ExecuteReader(cmd);
-                        var result = Project(reader, query.Projector);
-                        return result;
-            */
+/*
+            var reader = _provider.ExecuteReader(cmd);
+            var result = Project(reader, query.Projector);
+            return result;
+*/
 
             IEnumerable<T> result;
-            Type type = typeof(T);
+            Type type = typeof (T);
             //this is so hacky - the issue is that the Projector below uses Expression.Convert, which is a bottleneck
             //it's about 10x slower than our ToEnumerable. Our ToEnumerable, however, stumbles on Anon types and groupings
             //since it doesn't know how to instantiate them (I tried - not smart enough). So we do some trickery here.
-            if (type.Name.Contains("AnonymousType") || type.Name.StartsWith("Grouping`") || type.FullName.StartsWith("System."))
-            {
+            if (type.Name.Contains("AnonymousType") || type.Name.StartsWith("Grouping`") || type.FullName.StartsWith("System.")) {
                 var reader = _provider.ExecuteReader(cmd);
                 result = Project(reader, query.Projector);
-            }
-            else
+            } else
             {
 
                 using (var reader = _provider.ExecuteReader(cmd))
@@ -283,17 +282,16 @@ namespace SubSonic.Linq.Structure
 
                     //use our reader stuff
                     //thanks to Pascal LaCroix for the help here...
-                    var resultType = typeof(T);
+                    var resultType = typeof (T);
                     if (resultType.IsValueType)
                     {
                         result = reader.ToEnumerableValueType<T>();
+
                     }
                     else
                     {
-                        if (query.ColumnNames.Count != 0)
-                            result = reader.ToEnumerable<T>(query.ColumnNames);
-                        else
-                            result = reader.ToEnumerable<T>();
+                        result = reader.ToEnumerable<T>();
+
                     }
                 }
             }
